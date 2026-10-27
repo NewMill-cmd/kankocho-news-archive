@@ -2,7 +2,7 @@
 
 ライブで検出した官公庁・公的機関の公式発表を、日付・地域別のCSVで公開する非公式アーカイブです。
 
-公開予定URL： https://nnaoki498-cmd.github.io/kankocho-news-archive/
+公開予定URL： https://NewMill-cmd.github.io/kankocho-news-archive/
 
 ## 初回の公開設定
 
