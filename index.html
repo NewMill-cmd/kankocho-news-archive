@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="官公庁ニュースのライブで検出した公式発表を、日付・地域別のCSVでダウンロードできます。">
+<title>ニュースCSVアーカイブ｜官公庁ニュース</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;color:#172c3c;background:#f5f7f9}*{box-sizing:border-box}body{margin:0}main{max-width:1000px;margin:auto;padding:64px 24px}header{border-top:5px solid #21766e;padding-top:28px;margin-bottom:36px}.eyebrow{color:#21766e;letter-spacing:.14em;font-size:12px;font-weight:700}h1{font-size:clamp(25px,5vw,38px);letter-spacing:-.04em;margin:12px 0 18px}p{line-height:1.9;color:#526574}a{color:#17685f}form{display:flex;flex-wrap:wrap;gap:16px;padding:22px;background:white;border:1px solid #dce4e9;border-radius:12px}label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600}input,select{font:inherit;padding:10px 12px;border:1px solid #b9c7d1;border-radius:6px;background:white;color:#172c3c}#query{min-width:220px}#status{font-size:14px;margin:22px 0}.card{display:flex;justify-content:space-between;align-items:center;gap:20px;background:white;border:1px solid #dce4e9;padding:22px;margin:12px 0;border-radius:10px}.tag{font-size:12px;background:#e7f3ef;color:#17685f;padding:4px 9px;border-radius:20px}.card h2{font-size:19px;margin:12px 0 6px}.meta{font-size:13px;color:#526574;overflow-wrap:anywhere}.download{display:inline-block;white-space:nowrap;padding:12px 18px;border:1px solid #21766e;color:#17685f;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600}.download:hover{background:#e7f3ef}#empty{padding:48px 24px;text-align:center;background:#edf2f5;border-radius:10px}footer{margin-top:44px;border-top:1px solid #dce4e9;padding-top:22px;font-size:12px;color:#526574}footer p{margin:5px 0}a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #bb8c2c;outline-offset:3px}[hidden]{display:none!important}@media(max-width:550px){main{padding:32px 16px}.card{align-items:flex-start;flex-direction:column}.download{width:100%;text-align:center}label{width:100%}#query{min-width:0;width:100%}}
+</style>
+<main>
+<header><div class="eyebrow">KANKOCHO NEWS / OPEN ARCHIVE</div><h1>ニュースCSVアーカイブ</h1><p>ライブで検出した官公庁・公的機関の公式発表をまとめています。<br>日付・地域を選んで、CSVを無料でダウンロードできます。</p></header>
+<form onsubmit="return false" aria-label="CSVを絞り込む">
+<label>対象地域<select id="region"><option value="">すべての地域</option value="jp">日本</option><option value="us">米国</option><option value="eu">欧州</option><option value="other">その他</option></select></label>
+<label>日付<input id="date" type="date"></label>
+<label>ファイル名で検索<input id="query" type="search" placeholder="例：2026-10" autocomplete="off"></label>
+</form>
+<p id="status" role="status" aria-live="polite">一覧を読み込んでいます…</p>
+<div id="list"></div><p id="empty" hidden></p>
+<noscript><p>ダウンロード一覧の表示にはJavaScriptが必要です。<a href="https://github.com/nnaoki498-cmd/kankocho-news-archive/tree/main/data">GitHubのCSVフォルダー</a>からも確認できます。</p></noscript>
+<footer><p>このサイトは「官公庁ニュース」が運営する非公式のアーカイブです。</p><p>自動取得のため、すべての発表を網羅するものではありません。取得日と発表日は一致しない場合があります。各発表の内容・訂正は、CSVに記載された公式URLでご確認ください。</p><p>AIによる要約・翻訳を含む場合、誤りがある可能性があります。再利用時は、各発表元の利用条件をご確認ください。</p><p><a href="https://github.com/nnaoki498-cmd/kankocho-news-archive">GitHubでファイル・更新履歴を見る</a></p></footer>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), names={jp:'日本',us:'米国',eu:'欧州',other:'その他'};let files=[];
+function render(){const result=files.filter(f=>(!$('region').value||f.region===$('region').value)&&(!$('date').value||f.date===$('date').value)&&f.name.toLowerCase().includes($('query').value.toLowerCase()));$('list').replaceChildren();$('status').textContent=`公開ファイル ${files.length} 件 ／ 表示 ${result.length} 件`;$('empty').hidden=result.length>0;$('empty').textContent=files.length?'条件に一致するCSVはありません。':'公開準備中です。CSVを追加すると、ここに一覧が表示されます。';for(const f of result){if(!/^data\/(jp|us|eu|other)\/[A-Za-z0-9_.-]+\.csv$/.test(f.path))continue;const card=document.createElement('article');card.className='card';const info=document.createElement('div'),tag=document.createElement('span'),h=document.createElement('h2'),meta=document.createElement('div'),a=document.createElement('a');tag.className='tag';tag.textContent=names[f.region]||'その他';h.textContent=f.date;meta.className='meta';meta.textContent=`${f.name} · ${f.rows} 件 · ${Math.max(1,Math.round(f.bytes/1024))} KB`;info.append(tag,h,meta);a.className='download';a.href=f.path;a.download=f.name;a.textContent='CSVをダウンロード';a.setAttribute('aria-label',`${f.date} ${names[f.region]} CSVをダウンロード`);card.append(info,a);$('list').append(card)}}
+for(const id of ['region','date','query'])$(id).addEventListener('input',render);
+fetch('manifest.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(data=>{if(!Array.isArray(data.files))throw Error('Invalid manifest');files=data.files;render()}).catch(()=>{$('status').textContent='一覧を読み込めませんでした。時間をおいて再読み込みしてください。';$('empty').hidden=false;$('empty').replaceChildren();const a=document.createElement('a');a.href='https://github.com/nnaoki498-cmd/kankocho-news-archive/tree/main/data';a.textContent='GitHubのCSVフォルダーを開く';$('empty').append(a)});
+</script>
+</html>
