@@ -6,10 +6,16 @@
 <title>ニュースCSVアーカイブ｜官公庁ニュース</title>
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;color:#172c3c;background:#f5f7f9}*{box-sizing:border-box}body{margin:0}main{max-width:1000px;margin:auto;padding:64px 24px}header{border-top:5px solid #21766e;padding-top:28px;margin-bottom:36px}.eyebrow{color:#21766e;letter-spacing:.14em;font-size:12px;font-weight:700}h1{font-size:clamp(25px,5vw,38px);letter-spacing:-.04em;margin:12px 0 18px}p{line-height:1.9;color:#526574}a{color:#17685f}form{display:flex;flex-wrap:wrap;gap:16px;padding:22px;background:white;border:1px solid #dce4e9;border-radius:12px}label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600}input,select{font:inherit;padding:10px 12px;border:1px solid #b9c7d1;border-radius:6px;background:white;color:#172c3c}#query{min-width:220px}#status{font-size:14px;margin:22px 0}.card{display:flex;justify-content:space-between;align-items:center;gap:20px;background:white;border:1px solid #dce4e9;padding:22px;margin:12px 0;border-radius:10px}.tag{font-size:12px;background:#e7f3ef;color:#17685f;padding:4px 9px;border-radius:20px}.card h2{font-size:19px;margin:12px 0 6px}.meta{font-size:13px;color:#526574;overflow-wrap:anywhere}.download{display:inline-block;white-space:nowrap;padding:12px 18px;border:1px solid #21766e;color:#17685f;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600}.download:hover{background:#e7f3ef}#empty{padding:48px 24px;text-align:center;background:#edf2f5;border-radius:10px}footer{margin-top:44px;border-top:1px solid #dce4e9;padding-top:22px;font-size:12px;color:#526574}footer p{margin:5px 0}a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #bb8c2c;outline-offset:3px}[hidden]{display:none!important}@media(max-width:550px){main{padding:32px 16px}.card{align-items:flex-start;flex-direction:column}.download{width:100%;text-align:center}label{width:100%}#query{min-width:0;width:100%}}
-.support{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px 24px;margin-top:36px;padding:24px;background:#eaf3ef;border:1px solid #c9ddd5;border-radius:12px}.support h2{font-size:19px;margin:0 0 8px}.support p{font-size:14px;line-height:1.8;margin:0}.support small{grid-column:1/-1;color:#526574;font-size:12px}.support-link{display:inline-block;padding:13px 18px;border:1px solid #21766e;border-radius:6px;background:#fff;color:#17685f;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}.support-link:hover{background:#f6fcf8}@media(max-width:650px){.support{grid-template-columns:minmax(0,1fr);padding:20px}.support-link{text-align:center;white-space:normal}}
+.support{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px 24px;margin:0 0 24px;padding:24px;background:#eaf3ef;border:1px solid #c9ddd5;border-radius:12px}.support h2{font-size:19px;margin:0 0 8px}.support p{font-size:14px;line-height:1.8;margin:0}.support small{grid-column:1/-1;color:#526574;font-size:12px}.support-link{display:inline-block;padding:13px 18px;border:1px solid #21766e;border-radius:6px;background:#fff;color:#17685f;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}.support-link:hover{background:#f6fcf8}@media(max-width:650px){.support{grid-template-columns:minmax(0,1fr);padding:20px}.support-link{text-align:center;white-space:normal}}
 </style>
 <main>
 <header><div class="eyebrow">KANKOCHO NEWS / OPEN ARCHIVE</div><h1>ニュースCSVアーカイブ</h1><p>ライブで検出した官公庁・公的機関の公式発表をまとめています。<br>日付・地域を選んで、CSVを無料でダウンロードできます。</p></header>
+<section id="support" class="support" aria-labelledby="support-title">
+<div><h2 id="support-title">官公庁ニュースの活動を応援する</h2><p>支援は主に、ライブ中の質問回答や翻訳に使うOpenAI APIの利用料に充てます。CSVは無料でご利用いただけます。</p></div>
+<a class="support-link" href="https://note.com/deep_whale2807/n/n5b1f9439e282" target="_blank" rel="noopener noreferrer">noteで活動を応援する ↗</a>
+<small>チップは任意です。リンク先の記事下部からお送りいただけます。</small>
+</section>
+
 <form onsubmit="return false" aria-label="CSVを絞り込む">
 <label>対象地域<select id="region"><option value="">すべての地域</option value="jp">日本</option><option value="us">米国</option><option value="eu">欧州</option><option value="other">その他</option></select></label>
 <label>日付<input id="date" type="date"></label>
@@ -18,11 +24,6 @@
 <p id="status" role="status" aria-live="polite">一覧を読み込んでいます…</p>
 <div id="list"></div><p id="empty" hidden></p>
 <noscript><p>ダウンロード一覧の表示にはJavaScriptが必要です。<a href="https://github.com/NewMill-cmd/kankocho-news-archive/tree/main/data">GitHubのCSVフォルダー</a>からも確認できます。</p></noscript>
-<section id="support" class="support" aria-labelledby="support-title">
-<div><h2 id="support-title">官公庁ニュースの活動を応援する</h2><p>支援は主に、ライブ中の質問回答や翻訳に使うOpenAI APIの利用料に充てます。CSVは無料でご利用いただけます。</p></div>
-<a class="support-link" href="https://note.com/deep_whale2807/n/n5b1f9439e282" target="_blank" rel="noopener noreferrer">noteで活動を応援する ↗</a>
-<small>チップは任意です。リンク先の記事下部からお送りいただけます。</small>
-</section>
 <footer><p>このサイトは「官公庁ニュース」が運営する非公式のアーカイブです。</p><p>自動取得のため、すべての発表を網羅するものではありません。取得日と発表日は一致しない場合があります。各発表の内容・訂正は、CSVに記載された公式URLでご確認ください。</p><p>AIによる要約・翻訳を含む場合、誤りがある可能性があります。再利用時は、各発表元の利用条件をご確認ください。</p><p><a href="https://github.com/NewMill-cmd/kankocho-news-archive">GitHubでファイル・更新履歴を見る</a></p></footer>
 </main>
 <script>
