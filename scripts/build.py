@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / '_site'
-PATTERN = re.compile(r'(?P<date>\d{4}-\d{2}-\d{2})(?:[_.-][A-Za-z0-9_.-]+)?\.csv\Z')
+PATTERN = re.compile(r'(?:(?P<region>jp|us|eu|other)-)?(?P<date>\d{4}-\d{2}-\d{2})(?:[_.-][A-Za-z0-9_.-]+)?\.csv\Z')
 
 
 def spreadsheet_text(value):
@@ -34,8 +34,8 @@ def build():
             raise ValueError('Symlink folders are not allowed')
         for source in sorted(folder.glob('*.csv')):
             match = PATTERN.fullmatch(source.name)
-            if source.is_symlink() or not match:
-                raise ValueError('Use YYYY-MM-DD.csv or YYYY-MM-DD_suffix.csv; no symlinks')
+            if source.is_symlink() or not match or (match['region'] and match['region'] != region):
+                raise ValueError('Use YYYY-MM-DD.csv, YYYY-MM-DD_suffix.csv or REGION-YYYY-MM-DD.csv in the matching region folder; no symlinks')
             day = match['date']
             date.fromisoformat(day)
             if source.stat().st_size > 20 * 1024 * 1024:
