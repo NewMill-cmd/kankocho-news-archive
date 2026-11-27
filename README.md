@@ -1,6 +1,20 @@
-# 官公庁ニュース CSVアーカイブ
+# 官公庁ニュース CSVアーカイブ / Public Agency News CSV Archive
 
 ライブで検出した官公庁・公的機関の公式発表を、日付・地域別のCSVで公開する非公式アーカイブです。
+
+## English
+
+An independent, unofficial CSV archive of public-agency announcements collected during our livestreams, covering Japan, the United States and Europe.
+
+- [Browse in English](https://NewMill-cmd.github.io/kankocho-news-archive/?lang=en) / [日本語](https://NewMill-cmd.github.io/kankocho-news-archive/?lang=ja)
+- Select a date and region, or search filenames, then choose **Download CSV**. Downloads are free; CSV contents are not translated by the website.
+- [Watch our livestreams](https://www.youtube.com/@kankocho_news/streams). The international stream uses English headlines and narration. Use `Research: NASA` or `Question: What does this mean?` to participate. Type `!japanese` for a Japanese explanation of the current announcement; English resumes afterwards. The Japan stream is in Japanese.
+- Collection dates can differ from publication dates. Coverage is incomplete, and AI summaries or translations can contain errors. Check the official source URLs and each publisher’s reuse terms. We are not affiliated with any government or public agency.
+- [Optional support via note (Japanese)](https://note.com/deep_whale2807/n/n5b1f9439e282) mainly helps cover the OpenAI API used for questions and translation. The archive remains free.
+
+The interface supports 日本語 / English. A `?lang=` URL takes priority over the saved choice and browser language. Switching languages keeps your filters and does not alter CSV files. No external translation service or analytics is used by this website.
+
+---
 
 公開予定URL： https://NewMill-cmd.github.io/kankocho-news-archive/
 
