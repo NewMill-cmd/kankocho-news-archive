@@ -10,6 +10,7 @@
 
 .language-bar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:24px}.language-bar button{font:inherit;padding:8px 14px;border:1px solid #21766e;border-radius:6px;color:#17685f;background:white;cursor:pointer}.language-bar button[aria-pressed="true"]{background:#17685f;color:white}.language-bar button:focus-visible{outline:3px solid #bb8c2c;outline-offset:3px}.live-guide{margin:24px 0;padding:18px 22px;background:#fff;border:1px solid #dce4e9;border-radius:10px}.live-guide p{font-size:14px;margin:6px 0}.live-guide code{color:#174e49}html[lang="en"] h1{letter-spacing:-.025em}
 .bulk-tools{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;margin:20px 0}.bulk-tools #status{margin:0}.bulk-button{font:inherit;font-size:14px;font-weight:700;padding:12px 18px;background:#17685f;color:#fff;border:1px solid #17685f;border-radius:6px;cursor:pointer}.bulk-button:hover:not(:disabled){background:#10534c}.bulk-button:disabled{opacity:.55;cursor:default}.bulk-button:focus-visible{outline:3px solid #bb8c2c;outline-offset:3px}.bulk-help{font-size:13px;line-height:1.7;margin:8px 0;color:#526574}#bulk-status{font-size:14px;overflow-wrap:anywhere}#bulk-status[data-error="true"]{color:#a52b20}@media(max-width:550px){.bulk-button{width:100%}}
+.date-help,.date-error{flex-basis:100%;margin:0;font-size:13px;line-height:1.7}.date-error{color:#a52b20}input[aria-invalid="true"]{border-color:#a52b20}
 </style>
 <main>
 <nav class="language-bar" aria-label="Language / 言語"><button type="button" data-language="ja" aria-pressed="true" lang="ja">日本語</button><button type="button" data-language="en" aria-pressed="false" lang="en">English</button></nav>
@@ -22,8 +23,11 @@
 
 <form onsubmit="return false" aria-label="CSVを絞り込む">
 <label><span data-i18n="regionLabel">対象地域</span><select id="region"><option value="">すべての地域</option><option value="jp">日本</option><option value="us">米国</option><option value="eu">欧州</option><option value="other">その他</option></select></label>
-<label><span data-i18n="dateLabel">日付</span><input id="date" type="date"></label>
+<label><span data-i18n="dateFromLabel">開始日</span><input id="date-from" type="date" aria-describedby="date-help date-error"></label>
+<label><span data-i18n="dateToLabel">終了日</span><input id="date-to" type="date" aria-describedby="date-help date-error"></label>
 <label><span data-i18n="queryLabel">ファイル名で検索</span><input id="query" type="search" placeholder="例：2026-10" autocomplete="off"></label>
+<p id="date-help" class="date-help" data-i18n="dateHelp">開始日・終了日を含む期間で検索します。片方だけの指定も可能です。同じ日を両方に指定すると、その日だけ表示します。</p>
+<p id="date-error" class="date-error" role="alert" hidden></p>
 </form>
 <div class="bulk-tools"><p id="status" role="status" aria-live="polite">一覧を読み込んでいます…</p><button id="bulk-download" class="bulk-button" type="button" disabled>表示中のCSVを一括ダウンロード（ZIP）</button></div>
 <p class="bulk-help" data-i18n="bulkHelp">検索・日付・地域の条件に一致するすべてのCSVを、地域別フォルダーにまとめて保存します。</p>
@@ -38,7 +42,8 @@
 const $=id=>document.getElementById(id);
 const messages={"ja": {"title": "ニュースCSVアーカイブ｜官公庁ニュース", "description": "ライブで検出した官公庁・公的機関の公式発表を日付・地域別のCSVで無料公開しています。", "heading": "ニュースCSVアーカイブ", "intro": "ライブで検出した官公庁・公的機関の公式発表をまとめています。日付・地域を選んで、CSVを無料でダウンロードできます。", "watch": "YouTubeのライブ配信を見る ↗", "supportTitle": "官公庁ニュースの活動を応援する", "supportBody": "支援は主に、ライブ中の質問回答や翻訳に使うOpenAI APIの利用料に充てます。CSVは無料でご利用いただけます。", "supportLink": "noteで活動を応援する ↗", "supportNote": "チップは任意です。リンク先の記事下部からお送りいただけます。", "regionLabel": "対象地域", "dateLabel": "日付", "queryLabel": "ファイル名で検索", "placeholder": "例：2026-10", "filterLabel": "CSVを絞り込む", "regions": {"": "すべての地域", "jp": "日本", "us": "米国", "eu": "欧州", "other": "その他"}, "loading": "一覧を読み込んでいます…", "noMatch": "条件に一致するCSVはありません。", "noFiles": "公開準備中です。CSVを追加すると、ここに一覧が表示されます。", "failed": "一覧を読み込めませんでした。時間をおいて再読み込みしてください。", "browse": "GitHubのCSVフォルダーを開く", "download": "CSVをダウンロード", "guideTitle": "国際版ライブの参加方法", "guideBody": "国際版は英語の画面・音声で米国・欧州の公的機関の発表を紹介します。日本版は日本語です。", "guest": "「日本語解説」または !japanese で表示中の発表を日本語で解説し、終了後は英語へ戻ります。", "unofficial": "このサイトは「官公庁ニュース」が運営する非公式のアーカイブです。", "coverage": "自動取得のため、すべての発表を網羅するものではありません。取得日と発表日は一致しない場合があります。各発表の内容・訂正は、CSVに記載された公式URLでご確認ください。", "accuracy": "AIによる要約・翻訳を含む場合、誤りがある可能性があります。再利用時は、各発表元の利用条件をご確認ください。", "repository": "GitHubでファイル・更新履歴を見る"}, "en": {"title": "Public Agency News CSV Archive | Kankocho News", "description": "Download free CSV archives of official announcements collected from public agencies in Japan, the United States and Europe.", "heading": "Public Agency News CSV Archive", "intro": "Browse official announcements collected during our livestreams. Choose a date and region to download CSV files for free. CSV contents remain in their original languages.", "watch": "Watch our livestreams on YouTube ↗", "supportTitle": "Support Kankocho News", "supportBody": "Contributions mainly help cover the OpenAI API used for viewer questions and translation during livestreams. CSV downloads remain free.", "supportLink": "Support via note (Japanese) ↗", "supportNote": "Tips are optional. You can send one at the bottom of the linked note article.", "regionLabel": "Region", "dateLabel": "Date", "queryLabel": "Search filenames", "placeholder": "e.g. 2026-10", "filterLabel": "Filter CSV files", "regions": {"": "All regions", "jp": "Japan", "us": "United States", "eu": "Europe", "other": "Other"}, "loading": "Loading the archive…", "noMatch": "No CSV files match your filters.", "noFiles": "The archive is being prepared. CSV files will appear here when available.", "failed": "The archive could not be loaded. Please try again later.", "browse": "Browse CSV files on GitHub", "download": "Download CSV", "guideTitle": "Join the international livestream", "guideBody": "Our international stream introduces announcements from US and European public agencies with English headlines and narration. Our Japan stream is in Japanese.", "guest": "Type !japanese for a Japanese explanation of the current announcement. English narration resumes automatically afterwards.", "unofficial": "An independent, unofficial archive operated by Kankocho News. We are not affiliated with any government or public agency.", "coverage": "Automated collection does not cover every announcement. Collection dates may differ from publication dates. Check the official URLs in each CSV for details and corrections.", "accuracy": "AI-generated summaries and translations may contain errors. Check each source’s terms of use before reusing its material.", "repository": "View files and revision history on GitHub"}};
 Object.assign(messages.ja,{
- bulkHelp:'検索・日付・地域の条件に一致するすべてのCSVを、地域別フォルダーにまとめて保存します。',
+ dateFromLabel:'開始日',dateToLabel:'終了日',dateHelp:'開始日・終了日を含む期間で検索します。片方だけの指定も可能です。同じ日を両方に指定すると、その日だけ表示します。',dateError:'終了日は開始日と同じ日か、それより後の日を指定してください。',
+ bulkHelp:'検索・期間・地域の条件に一致するすべてのCSVを、地域別フォルダーにまとめて保存します。',
  bulkButton:n=>`表示中のCSV ${n} 件を一括ダウンロード（ZIP）`,
  bulkProgress:(n,total)=>`CSVを取得中 ${n} / ${total} 件…`,bulkPacking:'ZIPを作成しています…',
  bulkDone:n=>`${n} 件のCSVをまとめたZIPのダウンロードを開始しました。`,
@@ -46,7 +51,8 @@ Object.assign(messages.ja,{
  bulkLimit:'一度に保存できる上限（256 MB または65,535件）を超えています。検索条件を絞ってください。'
 });
 Object.assign(messages.en,{
- bulkHelp:'Download every CSV matching your search, date and region filters, organized into folders by region.',
+ dateFromLabel:'Start date',dateToLabel:'End date',dateHelp:'Both dates are included. You can leave either date blank. Select the same date in both fields to show a single day.',dateError:'The end date must be on or after the start date.',
+ bulkHelp:'Download every CSV matching your search, date range and region filters, organized into folders by region.',
  bulkButton:n=>`Download all ${n} shown CSVs (ZIP)`,
  bulkProgress:(n,total)=>`Fetching CSVs: ${n} / ${total}…`,bulkPacking:'Creating ZIP…',
  bulkDone:n=>`Started downloading a ZIP containing ${n} CSV files.`,
@@ -55,7 +61,17 @@ Object.assign(messages.en,{
 });
 let files=[],loadState='loading',language='ja';
 let bulk={mode:'idle',done:0,total:0};
-function filteredFiles(){return files.filter(f=>(!$('region').value||f.region===$('region').value)&&(!$('date').value||f.date===$('date').value)&&f.name.toLowerCase().includes($('query').value.toLowerCase()))}
+function invalidDateRange(){return Boolean($('date-from').value&&$('date-to').value&&$('date-from').value>$('date-to').value)}
+function renderDateRange(){
+ const invalid=invalidDateRange(),message=invalid?messages[language].dateError:'';
+ $('date-error').hidden=!invalid;$('date-error').textContent=message;
+ for(const id of ['date-from','date-to']){$(id).setAttribute('aria-invalid',String(invalid));$(id).setCustomValidity(message)}
+}
+function filteredFiles(){
+ if(invalidDateRange())return [];
+ const from=$('date-from').value,to=$('date-to').value,region=$('region').value,query=$('query').value.toLowerCase();
+ return files.filter(f=>(!region||f.region===region)&&(!from||f.date>=from)&&(!to||f.date<=to)&&f.name.toLowerCase().includes(query));
+}
 function renderBulk(){
  const m=messages[language],busy=bulk.mode==='fetching'||bulk.mode==='packing';
  const count=loadState==='ready'?filteredFiles().length:0;
@@ -124,12 +140,12 @@ $('bulk-download').addEventListener('click',downloadFiltered);
 function savedLanguage(){try{return localStorage.getItem('archive-language')}catch{return null}}
 function initialLanguage(){const query=new URL(location.href).searchParams.get('lang');if(query==='ja'||query==='en')return query;const saved=savedLanguage();if(saved==='ja'||saved==='en')return saved;return String(navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en'}
 function render(){
- const m=messages[language],list=$('list'),empty=$('empty');list.replaceChildren();empty.replaceChildren();renderBulk();
+ const m=messages[language],list=$('list'),empty=$('empty');list.replaceChildren();empty.replaceChildren();renderDateRange();renderBulk();
  if(loadState==='loading'){$('status').textContent=m.loading;empty.hidden=true;return}
  if(loadState==='error'){$('status').textContent=m.failed;empty.hidden=false;const a=document.createElement('a');a.href='https://github.com/NewMill-cmd/kankocho-news-archive/tree/main/data';a.textContent=m.browse;empty.append(a);return}
  const result=filteredFiles();
  $('status').textContent=language==='en'?`${files.length} files available / ${result.length} shown`:`公開ファイル ${files.length} 件 ／ 表示 ${result.length} 件`;
- empty.hidden=result.length>0;empty.textContent=files.length?m.noMatch:m.noFiles;
+ empty.hidden=result.length>0;empty.textContent=invalidDateRange()?m.dateError:files.length?m.noMatch:m.noFiles;
  for(const f of result){const card=document.createElement('article');card.className='card';const info=document.createElement('div'),tag=document.createElement('span'),h=document.createElement('h2'),meta=document.createElement('div'),a=document.createElement('a');tag.className='tag';tag.textContent=m.regions[f.region];h.textContent=f.date;meta.className='meta';meta.textContent=`${f.name} · ${f.rows} ${language==='en'?'rows':'件'} · ${Math.max(1,Math.round(f.bytes/1024))} KB`;info.append(tag,h,meta);a.className='download';a.href=f.path;a.download=f.name;a.textContent=m.download;a.setAttribute('aria-label',`${f.date} ${m.regions[f.region]} ${m.download}`);card.append(info,a);list.append(card)}
 }
 function setLanguage(value,remember=false){
@@ -141,7 +157,7 @@ function setLanguage(value,remember=false){
  render();
 }
 for(const b of document.querySelectorAll('[data-language]'))b.addEventListener('click',()=>setLanguage(b.dataset.language,true));
-for(const id of ['region','date','query'])$(id).addEventListener('input',()=>{if(!['fetching','packing'].includes(bulk.mode))bulk.mode='idle';render()});
+for(const id of ['region','date-from','date-to','query'])$(id).addEventListener('input',()=>{if(!['fetching','packing'].includes(bulk.mode))bulk.mode='idle';render()});
 setLanguage(initialLanguage());
 fetch('manifest.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(data=>{
  if(!Array.isArray(data.files))throw Error('Invalid manifest');
